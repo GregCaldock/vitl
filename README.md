@@ -4,18 +4,24 @@ To install the API locally for development, you'll need to follow these steps:
 
 1. Install Homestead
 1. Clone the repo
-1. Create a .env file
-1. Install dependencies
 1. Create the database
+1. SSH into the Vagrant Homestead instance
+1. Install dependencies
+1. Run the Database migration and seeder
 1. Create a hosts entry
+1. Browse to the site
 
 ### Install Homestead
 
 Follow the instructions at https://laravel.com/docs/homestead.
 
-You'll also need to add a site configuration to the `Homestead.yaml` file:
+You'll also need to add a file and site configuration to the `Homestead.yaml` file, the following is for OSX and Linux - Windows will be mapped differently:
 
 ```yaml
+folders:
+    - map: ~/code/vitl
+      to: /home/vagrant/code
+
 sites:
     - map: vitl.test
       to: /home/vagrant/code/public
@@ -26,12 +32,24 @@ sites:
 Create a `code` folder in your home directory, and clone the Vitl Test repo into it:
 
 ```bash
-git clone git@bitbucket.org:cliftonconnects/abf-api.git
+git clone https://github.com/GregCaldock/vitl.git
 ```
 
-### Create a .env file
+### Create the database
 
-Create a `.env` file inside the project directory, and paste in the contents of [this snippet](https://bitbucket.org/snippets/cliftonconnects/6e5xo9/abf-api-development-env-file).
+Connect to the Homestead MySQL server and create a new database called `homestead` (if it doesn't exist already). 
+
+### SSH into the Vagrant Homestead instance
+From the root of Homestead:
+```bash
+vagrant ssh
+```
+Then browse to the project root:
+```bash
+cd /home/vagrant/code
+```
+
+Run the following composer and artisan commands from here
 
 ### Install dependencies
 
@@ -41,57 +59,19 @@ Install Laravel and the other app dependencies via composer:
 composer install
 ```
 
-### Create the database
-
-Connect to the Homestead MySQL server and create a new database called `abf`. The quickest way to get the API database populated is to take a copy of the `abf-demo` database and import it into your new local DB.
-
-### Create Elasticsearch indices and import models
-
-Create an Elasticsearch index for the relevant model by running:
+### Run the Database migration and seeder
+Run the following artisan commands to set up the database
 
 ```bash
-php artisan elastic:create-index "App\Models\Business\Customer"
+php artisan migrate
 ```
-
-and import the existing records:
-
 ```bash
-php artisan scout:import "App\Models\Business\Customer"
-```
-
-The current list of Elasticsearch-enabled models is:
-
-```text
-App\Models\Account
-App\Models\Activity\Comment
-App\Models\Business\Customer
-App\Models\Business\Partner
-App\Models\Colour
-App\Models\Enquiry
-App\Models\Product
-App\Models\Referral
-```
-
-You'll need to start the queue to process the imports (NB: this could take a while!):
-
-```bash
-php artisan queue:listen
+php artisan db:seed
 ```
 
 ### Create a hosts entry
 
-Create an entry in the hosts file of your local machine to point `api.abf.test` at the IP `192.168.25.10`.
+Create an entry in the hosts file of your local machine to point `vitl.test` at the IP in `Homestead.yaml`.
 
-## Running the Tests
-
-To run the E2E test suite, you'll need to create test indices in your Elasticsearch instance by running the following artisan command:
-
-```bash
-php artisan elastic:create-test-indices --env=testing
-```
-
-You can then run the tests my running phpunit from within the project directory:
-
-```bash
-phpunit
-```
+### Browse to the site
+The search should be available on the root of http://vitl.test
