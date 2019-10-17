@@ -15,18 +15,21 @@ class PersonController extends Controller
     public function search(Request $request): JsonResponse
     {
         /* get the request variables */
-        $term = $request->get('term');
+        $terms = explode(' ', $request->get('term'));
         $dupes = $request->get('dupes');
 
-        /* set the initial Person query */
+        /* set the initial Person query select and order */
         $people = Person::select('first_name', 'last_name')->orderBy('last_name')->orderBy('first_name');
 
-        /* only search if there's a term to search for */
-        if ($term) {
-            $people->where('first_name', 'like', "%$term%")->orWhere('last_name', 'like', "%$term%");
+        /* search on each word entered */
+        foreach ($terms as $term) {
+            /* only search if there's a term to search for */
+            if ($term) {
+                $people->where('first_name', 'like', "%$term%")->orWhere('last_name', 'like', "%$term%");
+            }
         }
 
-        /* de-dupe if required */
+        /* de-dupe collection if required */
         if ($dupes === 'true') {
             $people->distinct();
         }
