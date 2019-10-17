@@ -58,7 +58,7 @@ Then browse to the project root:
 cd /home/vagrant/code
 ```
 
-Run the following composer and artisan commands from here
+While still logged into the vagrant instance:
 
 ### Create the database
 
